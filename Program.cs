@@ -26,11 +26,26 @@ app.MapGet("/tasks", (AppDbContext db) =>
     return Results.Ok(taskController.GetTasks());
 });
 
+app.MapGet("/task/{id}", (AppDbContext db, int id) =>
+{
+    TaskController taskController = new TaskController(db);
+
+    TaskItem? task = taskController.ShowTask(id);
+
+    if (task != null)
+    {
+        return Results.Ok(task);
+    }
+    return Results.NotFound();
+});
+
 app.MapPost("/tasks", (AppDbContext db, CreateTaskRequest request) =>
 {
     TaskController taskController = new TaskController(db);
 
-    if (string.IsNullOrWhiteSpace(request.Title))
+    TaskValidator taskValidator = new TaskValidator();
+
+    if (!taskValidator.IsValidTitle(request.Title))
     {
         return Results.BadRequest("Le titre est obligatoire.");
     }
@@ -44,9 +59,11 @@ app.MapDelete("/tasks/{id}", (AppDbContext db, int id) =>
 {
     TaskController taskController = new TaskController(db);
 
-    if (id <= 0)
+    TaskValidator taskValidator = new TaskValidator();
+
+    if (!taskValidator.IsValidId(id))
     {
-        return Results.BadRequest("L'ID ne peut pas être négatif.");
+        return Results.BadRequest("L'ID doit être positif.");
     }
 
     bool isDeleted = taskController.DeleteTask(id);
@@ -65,11 +82,14 @@ app.MapPut("/tasks/{id}", (AppDbContext db, int id, UpdateTaskRequest request) =
 {
     TaskController taskController = new TaskController(db);
 
-    if (id <= 0)
+    TaskValidator taskValidator = new TaskValidator();
+
+    if (!taskValidator.IsValidId(id))
     {
-        return Results.BadRequest("L'ID ne peut pas être négatif.");
+        return Results.BadRequest("L'ID doit être positif.");
     }
-    else if (string.IsNullOrWhiteSpace(request.Title))
+
+    if (!taskValidator.IsValidTitle(request.Title))
     {
         return Results.BadRequest("Le titre est obligatoire.");
     }

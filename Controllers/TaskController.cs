@@ -54,4 +54,9 @@ class TaskController
     {
         return db.Tasks.ToList();
     }
+
+    public TaskItem? ShowTask(int id)
+    {
+        return db.Tasks.FirstOrDefault(task => task.Id == id);
+    }
 }
