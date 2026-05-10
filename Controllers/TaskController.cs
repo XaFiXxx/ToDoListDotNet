@@ -1,38 +1,41 @@
 class TaskController
 {
-    private List<TaskItem> tasks = new List<TaskItem>();
 
-    public TaskController()
+    private AppDbContext db;
+
+    public TaskController(AppDbContext db)
     {
-        tasks.Add(new TaskItem(1, "Tâche 1", false));
-        tasks.Add(new TaskItem(2, "Tâche 2", false));
-        tasks.Add(new TaskItem(3, "Tâche 3", true));
+        this.db = db;
     }
 
     public void AddTask(CreateTaskRequest request)
     {
-        tasks.Add(new TaskItem(
-            tasks.Count + 1,
+        db.Tasks.Add(new TaskItem(
+            db.Tasks.Count() + 1,
             request.Title,
             false
         ));
+
+        db.SaveChanges();
     }
 
     public void DeleteTask(int id)
     {
-        foreach (TaskItem task in tasks)
+        foreach (TaskItem task in db.Tasks)
         {
             if (task.Id == id)
             {
-                tasks.Remove(task);
+                db.Tasks.Remove(task);
                 break;
             }
         }
+
+        db.SaveChanges();
     }
 
     public void UpdateTask(int id, UpdateTaskRequest request)
     {
-        foreach (TaskItem task in tasks)
+        foreach (TaskItem task in db.Tasks)
         {
             if (task.Id == id)
             {
@@ -41,10 +44,11 @@ class TaskController
                 break;
             }
         }
+        db.SaveChanges();
     }
 
     public List<TaskItem> GetTasks()
     {
-        return tasks;
+        return db.Tasks.ToList();
     }
 }

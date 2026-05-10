@@ -20,31 +20,34 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Liste des tâches
-TaskController taskController = new TaskController();
-
-app.MapGet("/tasks", () =>
+app.MapGet("/tasks", (AppDbContext db) =>
 {
+    TaskController taskController = new TaskController(db);
     return taskController.GetTasks();
-}
-);
+});
 
-app.MapPost("/tasks", (CreateTaskRequest request) =>
+app.MapPost("/tasks", (AppDbContext db, CreateTaskRequest request) =>
 {
+    TaskController taskController = new TaskController(db);
+
     taskController.AddTask(request);
 
     return taskController.GetTasks();
 });
 
-app.MapDelete("/tasks/{id}", (int id) =>
+app.MapDelete("/tasks/{id}", (AppDbContext db, int id) =>
 {
+    TaskController taskController = new TaskController(db);
+
     taskController.DeleteTask(id);
 
     return taskController.GetTasks();
 });
 
-app.MapPut("/tasks/{id}", (int id, UpdateTaskRequest request) =>
+app.MapPut("/tasks/{id}", (AppDbContext db, int id, UpdateTaskRequest request) =>
 {
+    TaskController taskController = new TaskController(db);
+
     taskController.UpdateTask(id, request);
 
     return taskController.GetTasks();
