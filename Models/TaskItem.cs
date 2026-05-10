@@ -20,15 +20,3 @@ class TaskItem
         Title = title;
     }
 }
-
-class CreateTaskRequest
-
-{
-    public string Title { get; set; } = "";
-}
-
-class UpdateTaskRequest
-{
-    public string Title { get; set; } = "";
-    public bool IsCompleted { get; set; }
-}

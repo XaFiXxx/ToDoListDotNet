@@ -107,4 +107,3 @@ app.MapPut("/tasks/{id}", (AppDbContext db, int id, UpdateTaskRequest request) =
 });
 
 app.Run();
-
