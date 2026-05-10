@@ -8,43 +8,46 @@ class TaskController
         this.db = db;
     }
 
-    public void AddTask(CreateTaskRequest request)
+    public TaskItem AddTask(CreateTaskRequest request)
     {
-        db.Tasks.Add(new TaskItem(
-            db.Tasks.Count() + 1,
+        TaskItem task = new TaskItem(
             request.Title,
             false
-        ));
+        );
 
+        db.Tasks.Add(task);
         db.SaveChanges();
+
+        return task;
     }
 
-    public void DeleteTask(int id)
+    public bool DeleteTask(int id)
     {
-        foreach (TaskItem task in db.Tasks)
+        foreach (TaskItem task in db.Tasks.ToList())
         {
             if (task.Id == id)
             {
                 db.Tasks.Remove(task);
-                break;
+                db.SaveChanges();
+                return true;
             }
         }
-
-        db.SaveChanges();
+        return false;
     }
 
-    public void UpdateTask(int id, UpdateTaskRequest request)
+    public bool UpdateTask(int id, UpdateTaskRequest request)
     {
-        foreach (TaskItem task in db.Tasks)
+        foreach (TaskItem task in db.Tasks.ToList())
         {
             if (task.Id == id)
             {
                 task.UpdateTitle(request.Title);
                 task.Complete(request.IsCompleted);
-                break;
+                db.SaveChanges();
+                return true;
             }
         }
-        db.SaveChanges();
+        return false;
     }
 
     public List<TaskItem> GetTasks()

@@ -4,16 +4,15 @@ class TaskItem
     public string Title { get; private set; } = "";
     public bool IsCompleted { get; private set; }
 
-    public TaskItem(int id, string title, bool isCompleted)
+    public TaskItem(string title, bool isCompleted)
     {
-        Id = id;
         Title = title;
         IsCompleted = isCompleted;
     }
 
     public void Complete(bool IsCompleted)
     {
-        IsCompleted = true;
+        this.IsCompleted = IsCompleted;
     }
 
     public void UpdateTitle(string title)

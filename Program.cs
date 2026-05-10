@@ -23,34 +23,67 @@ app.UseHttpsRedirection();
 app.MapGet("/tasks", (AppDbContext db) =>
 {
     TaskController taskController = new TaskController(db);
-    return taskController.GetTasks();
+    return Results.Ok(taskController.GetTasks());
 });
 
 app.MapPost("/tasks", (AppDbContext db, CreateTaskRequest request) =>
 {
     TaskController taskController = new TaskController(db);
 
-    taskController.AddTask(request);
+    if (string.IsNullOrWhiteSpace(request.Title))
+    {
+        return Results.BadRequest("Le titre est obligatoire.");
+    }
 
-    return taskController.GetTasks();
+    TaskItem createdTask = taskController.AddTask(request);
+
+    return Results.Created($"/tasks/{createdTask.Id}", createdTask);
 });
 
 app.MapDelete("/tasks/{id}", (AppDbContext db, int id) =>
 {
     TaskController taskController = new TaskController(db);
 
-    taskController.DeleteTask(id);
+    if (id <= 0)
+    {
+        return Results.BadRequest("L'ID ne peut pas être négatif.");
+    }
 
-    return taskController.GetTasks();
+    bool isDeleted = taskController.DeleteTask(id);
+
+    if (isDeleted)
+    {
+        return Results.NoContent();
+    }
+    else
+    {
+        return Results.NotFound();
+    }
 });
 
 app.MapPut("/tasks/{id}", (AppDbContext db, int id, UpdateTaskRequest request) =>
 {
     TaskController taskController = new TaskController(db);
 
-    taskController.UpdateTask(id, request);
+    if (id <= 0)
+    {
+        return Results.BadRequest("L'ID ne peut pas être négatif.");
+    }
+    else if (string.IsNullOrWhiteSpace(request.Title))
+    {
+        return Results.BadRequest("Le titre est obligatoire.");
+    }
 
-    return taskController.GetTasks();
+    bool isUpdated = taskController.UpdateTask(id, request);
+
+    if (isUpdated)
+    {
+        return Results.Ok(taskController.GetTasks());
+    }
+    else
+    {
+        return Results.NotFound();
+    }
 });
 
 app.Run();
