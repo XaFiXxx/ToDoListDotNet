@@ -16,7 +16,16 @@ public class TaskController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetTasks()
     {
-        return Ok(await taskService.GetTasks());
+        List<TaskItem> tasks = await taskService.GetTasks();
+
+        List<TaskResponse> responses = tasks.Select(task => new TaskResponse
+        {
+            Id = task.Id,
+            Title = task.Title,
+            IsCompleted = task.IsCompleted
+        }).ToList();
+
+        return Ok(responses);
     }
 
     [HttpGet("{id}")]
@@ -24,11 +33,19 @@ public class TaskController : ControllerBase
     {
         TaskItem? task = await taskService.ShowTask(id);
 
-        if (task != null)
+        if (task == null)
         {
-            return Ok(task);
+            return NotFound();
         }
-        return NotFound();
+
+        TaskResponse response = new TaskResponse
+        {
+            Id = task.Id,
+            Title = task.Title,
+            IsCompleted = task.IsCompleted
+        };
+
+        return Ok(response);
     }
 
     [HttpPost]
@@ -41,7 +58,14 @@ public class TaskController : ControllerBase
 
         TaskItem createdTask = await taskService.AddTask(request);
 
-        return Created($"/tasks/{createdTask.Id}", createdTask);
+        TaskResponse response = new TaskResponse
+        {
+            Id = createdTask.Id,
+            Title = createdTask.Title,
+            IsCompleted = createdTask.IsCompleted
+        };
+
+        return Created($"/tasks/{createdTask.Id}", response);
     }
 
     [HttpDelete("{id}")]
@@ -81,11 +105,21 @@ public class TaskController : ControllerBase
 
         if (isUpdated)
         {
-            return Ok(await taskService.GetTasks());
+            TaskItem? task = await taskService.ShowTask(id);
+
+            if (task == null)
+            {
+                return NotFound();
+            }
+
+            TaskResponse response = new TaskResponse
+            {
+                Id = task.Id,
+                Title = task.Title,
+                IsCompleted = task.IsCompleted
+            };
+            return Ok(response);
         }
-        else
-        {
-            return NotFound();
-        }
+        return NotFound();
     }
 }
