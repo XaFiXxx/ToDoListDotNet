@@ -9,4 +9,9 @@ public class TaskMapper
             IsCompleted = task.IsCompleted
         };
     }
+
+    public List<TaskResponse> ToResponseList(List<TaskItem> tasks)
+    {
+        return tasks.Select(task => ToResponse(task)).ToList();
+    }
 }

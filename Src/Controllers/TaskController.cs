@@ -21,13 +21,13 @@ public class TaskController : ControllerBase
     {
         List<TaskItem> tasks = await taskService.GetTasks();
 
-        List<TaskResponse> responses = tasks.Select(task => taskMapper.ToResponse(task)).ToList();
+        List<TaskResponse> response = taskMapper.ToResponseList(tasks);
 
-        return Ok(responses);
+        return Ok(response);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> ShowTask(int id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> ShowTask([FromRoute] int id)
     {
         TaskItem? task = await taskService.ShowTask(id);
 
@@ -56,8 +56,8 @@ public class TaskController : ControllerBase
         return Created($"/tasks/{response.Id}", response);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTask(int id)
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteTask([FromRoute] int id)
     {
         if (!taskValidator.IsValidId(id))
         {
@@ -76,8 +76,8 @@ public class TaskController : ControllerBase
         }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTask(int id, UpdateTaskRequest request)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdateTask([FromRoute] int id, UpdateTaskRequest request)
     {
         if (!taskValidator.IsValidId(id))
         {
