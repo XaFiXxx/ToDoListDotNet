@@ -10,6 +10,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+builder.Services.AddControllers();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -20,90 +22,92 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/tasks", async (AppDbContext db) =>
-{
-    TaskController taskController = new TaskController(db);
-    return Results.Ok(await taskController.GetTasks());
-});
+app.MapControllers();
 
-app.MapGet("/task/{id}", async (AppDbContext db, int id) =>
-{
-    TaskController taskController = new TaskController(db);
+// app.MapGet("/tasks", async (AppDbContext db) =>
+// {
+//     TaskController taskController = new TaskController(db);
+//     return Results.Ok(await taskController.GetTasks());
+// });
 
-    TaskItem? task = await taskController.ShowTask(id);
+// app.MapGet("/task/{id}", async (AppDbContext db, int id) =>
+// {
+//     TaskController taskController = new TaskController(db);
 
-    if (task != null)
-    {
-        return Results.Ok(task);
-    }
-    return Results.NotFound();
-});
+//     TaskItem? task = await taskController.ShowTask(id);
 
-app.MapPost("/tasks", async (AppDbContext db, CreateTaskRequest request) =>
-{
-    TaskController taskController = new TaskController(db);
+//     if (task != null)
+//     {
+//         return Results.Ok(task);
+//     }
+//     return Results.NotFound();
+// });
 
-    TaskValidator taskValidator = new TaskValidator();
+// app.MapPost("/tasks", async (AppDbContext db, CreateTaskRequest request) =>
+// {
+//     TaskController taskController = new TaskController(db);
 
-    if (!taskValidator.IsValidTitle(request.Title))
-    {
-        return Results.BadRequest("Le titre est obligatoire.");
-    }
+//     TaskValidator taskValidator = new TaskValidator();
 
-    TaskItem createdTask = await taskController.AddTask(request);
+//     if (!taskValidator.IsValidTitle(request.Title))
+//     {
+//         return Results.BadRequest("Le titre est obligatoire.");
+//     }
 
-    return Results.Created($"/tasks/{createdTask.Id}", createdTask);
-});
+//     TaskItem createdTask = await taskController.AddTask(request);
 
-app.MapDelete("/tasks/{id}", async (AppDbContext db, int id) =>
-{
-    TaskController taskController = new TaskController(db);
+//     return Results.Created($"/tasks/{createdTask.Id}", createdTask);
+// });
 
-    TaskValidator taskValidator = new TaskValidator();
+// app.MapDelete("/tasks/{id}", async (AppDbContext db, int id) =>
+// {
+//     TaskController taskController = new TaskController(db);
 
-    if (!taskValidator.IsValidId(id))
-    {
-        return Results.BadRequest("L'ID doit être positif.");
-    }
+//     TaskValidator taskValidator = new TaskValidator();
 
-    bool isDeleted = await taskController.DeleteTask(id);
+//     if (!taskValidator.IsValidId(id))
+//     {
+//         return Results.BadRequest("L'ID doit être positif.");
+//     }
 
-    if (isDeleted)
-    {
-        return Results.NoContent();
-    }
-    else
-    {
-        return Results.NotFound();
-    }
-});
+//     bool isDeleted = await taskController.DeleteTask(id);
 
-app.MapPut("/tasks/{id}", async (AppDbContext db, int id, UpdateTaskRequest request) =>
-{
-    TaskController taskController = new TaskController(db);
+//     if (isDeleted)
+//     {
+//         return Results.NoContent();
+//     }
+//     else
+//     {
+//         return Results.NotFound();
+//     }
+// });
 
-    TaskValidator taskValidator = new TaskValidator();
+// app.MapPut("/tasks/{id}", async (AppDbContext db, int id, UpdateTaskRequest request) =>
+// {
+//     TaskController taskController = new TaskController(db);
 
-    if (!taskValidator.IsValidId(id))
-    {
-        return Results.BadRequest("L'ID doit être positif.");
-    }
+//     TaskValidator taskValidator = new TaskValidator();
 
-    if (!taskValidator.IsValidTitle(request.Title))
-    {
-        return Results.BadRequest("Le titre est obligatoire.");
-    }
+//     if (!taskValidator.IsValidId(id))
+//     {
+//         return Results.BadRequest("L'ID doit être positif.");
+//     }
 
-    bool isUpdated = await taskController.UpdateTask(id, request);
+//     if (!taskValidator.IsValidTitle(request.Title))
+//     {
+//         return Results.BadRequest("Le titre est obligatoire.");
+//     }
 
-    if (isUpdated)
-    {
-        return Results.Ok(await taskController.GetTasks());
-    }
-    else
-    {
-        return Results.NotFound();
-    }
-});
+//     bool isUpdated = await taskController.UpdateTask(id, request);
+
+//     if (isUpdated)
+//     {
+//         return Results.Ok(await taskController.GetTasks());
+//     }
+//     else
+//     {
+//         return Results.NotFound();
+//     }
+// });
 
 app.Run();

@@ -1,4 +1,4 @@
-class TaskItem
+public class TaskItem
 {
     public int Id { get; private set; }
     public string Title { get; private set; } = "";

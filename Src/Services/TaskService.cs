@@ -1,11 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 
-class TaskController
+class TaskService
 {
 
     private AppDbContext db;
 
-    public TaskController(AppDbContext db)
+    public TaskService(AppDbContext db)
     {
         this.db = db;
     }
