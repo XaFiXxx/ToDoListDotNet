@@ -7,18 +7,19 @@ public class TaskController : ControllerBase
     private readonly TaskService taskService;
     private readonly TaskValidator taskValidator;
 
-    public TaskController(TaskService taskService, TaskValidator taskValidator)
+    private readonly TaskMapper taskMapper;
+
+    public TaskController(TaskService taskService, TaskValidator taskValidator, TaskMapper taskMapper)
     {
         this.taskService = taskService;
         this.taskValidator = taskValidator;
+        this.taskMapper = taskMapper;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetTasks()
     {
         List<TaskItem> tasks = await taskService.GetTasks();
-
-        TaskMapper taskMapper = new TaskMapper();
 
         List<TaskResponse> responses = tasks.Select(task => taskMapper.ToResponse(task)).ToList();
 
@@ -35,8 +36,6 @@ public class TaskController : ControllerBase
             return NotFound();
         }
 
-        TaskMapper taskMapper = new TaskMapper();
-
         TaskResponse response = taskMapper.ToResponse(task);
 
         return Ok(response);
@@ -51,8 +50,6 @@ public class TaskController : ControllerBase
         }
 
         TaskItem createdTask = await taskService.AddTask(request);
-
-        TaskMapper taskMapper = new TaskMapper();
 
         TaskResponse response = taskMapper.ToResponse(createdTask);
 
@@ -102,8 +99,6 @@ public class TaskController : ControllerBase
             {
                 return NotFound();
             }
-
-            TaskMapper taskMapper = new TaskMapper();
 
             TaskResponse response = taskMapper.ToResponse(task);
 

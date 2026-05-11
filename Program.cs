@@ -14,6 +14,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<TaskValidator>();
+builder.Services.AddScoped<TaskMapper>();
 
 var app = builder.Build();
 
