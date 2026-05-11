@@ -39,13 +39,13 @@ public class TaskService
         return true;
     }
 
-    public async Task<bool> UpdateTask(int id, UpdateTaskRequest request)
+    public async Task<TaskItem?> UpdateTask(int id, UpdateTaskRequest request)
     {
         TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
 
         if (task == null)
         {
-            return false;
+            return null;
         }
 
         task.UpdateTitle(request.Title);
@@ -53,7 +53,7 @@ public class TaskService
 
         await db.SaveChangesAsync();
 
-        return true;
+        return task;
     }
 
     public async Task<List<TaskItem>> GetTasks()

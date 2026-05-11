@@ -89,21 +89,15 @@ public class TaskController : ControllerBase
             return BadRequest("Le titre est obligatoire.");
         }
 
-        bool isUpdated = await taskService.UpdateTask(id, request);
+        TaskItem? updatedTask = await taskService.UpdateTask(id, request);
 
-        if (isUpdated)
+        if (updatedTask == null)
         {
-            TaskItem? task = await taskService.ShowTask(id);
-
-            if (task == null)
-            {
-                return NotFound();
-            }
-
-            TaskResponse response = taskMapper.ToResponse(task);
-
-            return Ok(response);
+            return NotFound();
         }
-        return NotFound();
+
+        TaskResponse response = taskMapper.ToResponse(updatedTask);
+
+        return Ok(response);
     }
 }
