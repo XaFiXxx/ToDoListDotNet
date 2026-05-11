@@ -20,17 +20,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/tasks", (AppDbContext db) =>
+app.MapGet("/tasks", async (AppDbContext db) =>
 {
     TaskController taskController = new TaskController(db);
-    return Results.Ok(taskController.GetTasks());
+    return Results.Ok(await taskController.GetTasks());
 });
 
-app.MapGet("/task/{id}", (AppDbContext db, int id) =>
+app.MapGet("/task/{id}", async (AppDbContext db, int id) =>
 {
     TaskController taskController = new TaskController(db);
 
-    TaskItem? task = taskController.ShowTask(id);
+    TaskItem? task = await taskController.ShowTask(id);
 
     if (task != null)
     {
@@ -39,7 +39,7 @@ app.MapGet("/task/{id}", (AppDbContext db, int id) =>
     return Results.NotFound();
 });
 
-app.MapPost("/tasks", (AppDbContext db, CreateTaskRequest request) =>
+app.MapPost("/tasks", async (AppDbContext db, CreateTaskRequest request) =>
 {
     TaskController taskController = new TaskController(db);
 
@@ -50,12 +50,12 @@ app.MapPost("/tasks", (AppDbContext db, CreateTaskRequest request) =>
         return Results.BadRequest("Le titre est obligatoire.");
     }
 
-    TaskItem createdTask = taskController.AddTask(request);
+    TaskItem createdTask = await taskController.AddTask(request);
 
     return Results.Created($"/tasks/{createdTask.Id}", createdTask);
 });
 
-app.MapDelete("/tasks/{id}", (AppDbContext db, int id) =>
+app.MapDelete("/tasks/{id}", async (AppDbContext db, int id) =>
 {
     TaskController taskController = new TaskController(db);
 
@@ -66,7 +66,7 @@ app.MapDelete("/tasks/{id}", (AppDbContext db, int id) =>
         return Results.BadRequest("L'ID doit être positif.");
     }
 
-    bool isDeleted = taskController.DeleteTask(id);
+    bool isDeleted = await taskController.DeleteTask(id);
 
     if (isDeleted)
     {
@@ -78,7 +78,7 @@ app.MapDelete("/tasks/{id}", (AppDbContext db, int id) =>
     }
 });
 
-app.MapPut("/tasks/{id}", (AppDbContext db, int id, UpdateTaskRequest request) =>
+app.MapPut("/tasks/{id}", async (AppDbContext db, int id, UpdateTaskRequest request) =>
 {
     TaskController taskController = new TaskController(db);
 
@@ -94,11 +94,11 @@ app.MapPut("/tasks/{id}", (AppDbContext db, int id, UpdateTaskRequest request) =
         return Results.BadRequest("Le titre est obligatoire.");
     }
 
-    bool isUpdated = taskController.UpdateTask(id, request);
+    bool isUpdated = await taskController.UpdateTask(id, request);
 
     if (isUpdated)
     {
-        return Results.Ok(taskController.GetTasks());
+        return Results.Ok(await taskController.GetTasks());
     }
     else
     {

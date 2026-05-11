@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 class TaskController
 {
 
@@ -8,7 +10,7 @@ class TaskController
         this.db = db;
     }
 
-    public TaskItem AddTask(CreateTaskRequest request)
+    public async Task<TaskItem> AddTask(CreateTaskRequest request)
     {
         TaskItem task = new TaskItem(
             request.Title,
@@ -16,47 +18,51 @@ class TaskController
         );
 
         db.Tasks.Add(task);
-        db.SaveChanges();
+        await db.SaveChangesAsync();
 
         return task;
     }
 
-    public bool DeleteTask(int id)
+    public async Task<bool> DeleteTask(int id)
     {
-        foreach (TaskItem task in db.Tasks.ToList())
+        TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
+
+        if (task == null)
         {
-            if (task.Id == id)
-            {
-                db.Tasks.Remove(task);
-                db.SaveChanges();
-                return true;
-            }
+            return false;
         }
-        return false;
+
+        db.Tasks.Remove(task);
+
+        await db.SaveChangesAsync();
+
+        return true;
     }
 
-    public bool UpdateTask(int id, UpdateTaskRequest request)
+    public async Task<bool> UpdateTask(int id, UpdateTaskRequest request)
     {
-        foreach (TaskItem task in db.Tasks.ToList())
+        TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
+
+        if (task == null)
         {
-            if (task.Id == id)
-            {
-                task.UpdateTitle(request.Title);
-                task.Complete(request.IsCompleted);
-                db.SaveChanges();
-                return true;
-            }
+            return false;
         }
-        return false;
+
+        task.UpdateTitle(request.Title);
+        task.Complete(request.IsCompleted);
+
+        await db.SaveChangesAsync();
+
+        return true;
     }
 
-    public List<TaskItem> GetTasks()
+    public async Task<List<TaskItem>> GetTasks()
     {
-        return db.Tasks.ToList();
+        return await db.Tasks.ToListAsync();
     }
 
-    public TaskItem? ShowTask(int id)
+    public async Task<TaskItem?> ShowTask(int id)
     {
-        return db.Tasks.FirstOrDefault(task => task.Id == id);
+        return await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
     }
 }
