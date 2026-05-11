@@ -4,19 +4,24 @@ using Microsoft.AspNetCore.Mvc;
 [Route("tasks")]
 public class TaskController : ControllerBase
 {
-    [HttpGet]
-    public async Task<IActionResult> GetTasks(AppDbContext db)
-    {
-        TaskService taskService = new TaskService(db);
+    private readonly TaskService taskService;
+    private readonly TaskValidator taskValidator;
 
+    public TaskController(TaskService taskService, TaskValidator taskValidator)
+    {
+        this.taskService = taskService;
+        this.taskValidator = taskValidator;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetTasks()
+    {
         return Ok(await taskService.GetTasks());
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> ShowTask(AppDbContext db, int id)
+    public async Task<IActionResult> ShowTask(int id)
     {
-        TaskService taskService = new TaskService(db);
-
         TaskItem? task = await taskService.ShowTask(id);
 
         if (task != null)
@@ -27,12 +32,8 @@ public class TaskController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddTask(AppDbContext db, CreateTaskRequest request)
+    public async Task<IActionResult> AddTask(CreateTaskRequest request)
     {
-        TaskService taskService = new TaskService(db);
-
-        TaskValidator taskValidator = new TaskValidator();
-
         if (!taskValidator.IsValidTitle(request.Title))
         {
             return BadRequest("Le titre est obligatoire.");
@@ -44,12 +45,8 @@ public class TaskController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTask(AppDbContext db, int id)
+    public async Task<IActionResult> DeleteTask(int id)
     {
-        TaskService taskService = new TaskService(db);
-
-        TaskValidator taskValidator = new TaskValidator();
-
         if (!taskValidator.IsValidId(id))
         {
             return BadRequest("L'ID doit être positif.");
@@ -68,12 +65,8 @@ public class TaskController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateTask(AppDbContext db, int id, UpdateTaskRequest request)
+    public async Task<IActionResult> UpdateTask(int id, UpdateTaskRequest request)
     {
-        TaskService taskService = new TaskService(db);
-
-        TaskValidator taskValidator = new TaskValidator();
-
         if (!taskValidator.IsValidId(id))
         {
             return BadRequest("L'ID doit être positif.");

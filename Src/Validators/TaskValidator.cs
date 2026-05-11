@@ -1,4 +1,4 @@
-class TaskValidator
+public class TaskValidator
 {
     public bool IsValidId(int id)
     {

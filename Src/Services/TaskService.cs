@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-class TaskService
+public class TaskService
 {
 
     private AppDbContext db;
