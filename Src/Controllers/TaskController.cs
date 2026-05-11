@@ -18,12 +18,9 @@ public class TaskController : ControllerBase
     {
         List<TaskItem> tasks = await taskService.GetTasks();
 
-        List<TaskResponse> responses = tasks.Select(task => new TaskResponse
-        {
-            Id = task.Id,
-            Title = task.Title,
-            IsCompleted = task.IsCompleted
-        }).ToList();
+        TaskMapper taskMapper = new TaskMapper();
+
+        List<TaskResponse> responses = tasks.Select(task => taskMapper.ToResponse(task)).ToList();
 
         return Ok(responses);
     }
@@ -38,12 +35,9 @@ public class TaskController : ControllerBase
             return NotFound();
         }
 
-        TaskResponse response = new TaskResponse
-        {
-            Id = task.Id,
-            Title = task.Title,
-            IsCompleted = task.IsCompleted
-        };
+        TaskMapper taskMapper = new TaskMapper();
+
+        TaskResponse response = taskMapper.ToResponse(task);
 
         return Ok(response);
     }
@@ -58,14 +52,11 @@ public class TaskController : ControllerBase
 
         TaskItem createdTask = await taskService.AddTask(request);
 
-        TaskResponse response = new TaskResponse
-        {
-            Id = createdTask.Id,
-            Title = createdTask.Title,
-            IsCompleted = createdTask.IsCompleted
-        };
+        TaskMapper taskMapper = new TaskMapper();
 
-        return Created($"/tasks/{createdTask.Id}", response);
+        TaskResponse response = taskMapper.ToResponse(createdTask);
+
+        return Created($"/tasks/{response.Id}", response);
     }
 
     [HttpDelete("{id}")]
@@ -112,12 +103,10 @@ public class TaskController : ControllerBase
                 return NotFound();
             }
 
-            TaskResponse response = new TaskResponse
-            {
-                Id = task.Id,
-                Title = task.Title,
-                IsCompleted = task.IsCompleted
-            };
+            TaskMapper taskMapper = new TaskMapper();
+
+            TaskResponse response = taskMapper.ToResponse(task);
+
             return Ok(response);
         }
         return NotFound();
