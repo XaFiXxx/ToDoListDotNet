@@ -1,3 +1,5 @@
+using ToDoListCSharp.Src.Models;
+
 public class TaskMapper
 {
     public TaskResponse ToResponse(TaskItem task)

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ToDoListCSharp.Src.Models;
 
 public class TaskService
 {
@@ -14,7 +15,8 @@ public class TaskService
     {
         TaskItem task = new TaskItem(
             request.Title,
-            false
+            false,
+            1
         );
 
         db.Tasks.Add(task);

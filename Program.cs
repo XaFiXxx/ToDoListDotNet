@@ -12,6 +12,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserValidator>();
+builder.Services.AddScoped<UserMapper>();
+
 builder.Services.AddScoped<TaskService>();
 builder.Services.AddScoped<TaskValidator>();
 builder.Services.AddScoped<TaskMapper>();
