@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDoListCSharp.Src.Models;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("tasks")]
@@ -15,6 +16,7 @@ public class TaskController : ControllerBase
         this.taskMapper = taskMapper;
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetTasks()
     {
@@ -25,6 +27,7 @@ public class TaskController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> ShowTask([FromRoute] int id)
     {
@@ -40,6 +43,7 @@ public class TaskController : ControllerBase
         return Ok(response);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> AddTask(CreateTaskRequest request)
     {
@@ -50,6 +54,7 @@ public class TaskController : ControllerBase
         return Created($"/tasks/{response.Id}", response);
     }
 
+    [Authorize]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteTask([FromRoute] int id)
     {
@@ -65,6 +70,7 @@ public class TaskController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateTask([FromRoute] int id, UpdateTaskRequest request)
     {
