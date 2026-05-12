@@ -16,7 +16,7 @@ public class TaskService
         TaskItem task = new TaskItem(
             request.Title,
             false,
-            1
+            request.UserId
         );
 
         db.Tasks.Add(task);
