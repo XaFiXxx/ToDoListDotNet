@@ -3,12 +3,13 @@ using ToDoListCSharp.Src.Models;
 
 public class TaskService
 {
-
     private AppDbContext db;
+    private readonly ICurrentUserService _currentUserService;
 
-    public TaskService(AppDbContext db)
+    public TaskService(AppDbContext db, ICurrentUserService currentUserService)
     {
         this.db = db;
+        _currentUserService = currentUserService;
     }
 
     public async Task<TaskItem> AddTask(CreateTaskRequest request)
@@ -16,10 +17,11 @@ public class TaskService
         TaskItem task = new TaskItem(
             request.Title,
             false,
-            request.UserId
+            _currentUserService.UserId
         );
 
         db.Tasks.Add(task);
+
         await db.SaveChangesAsync();
 
         return task;
@@ -27,7 +29,10 @@ public class TaskService
 
     public async Task<bool> DeleteTask(int id)
     {
-        TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
+        TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task =>
+            task.Id == id &&
+            task.UserId == _currentUserService.UserId
+        );
 
         if (task == null)
         {
@@ -43,7 +48,10 @@ public class TaskService
 
     public async Task<TaskItem?> UpdateTask(int id, UpdateTaskRequest request)
     {
-        TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
+        TaskItem? task = await db.Tasks.FirstOrDefaultAsync(task =>
+            task.Id == id &&
+            task.UserId == _currentUserService.UserId
+        );
 
         if (task == null)
         {
@@ -60,11 +68,16 @@ public class TaskService
 
     public async Task<List<TaskItem>> GetTasks()
     {
-        return await db.Tasks.ToListAsync();
+        return await db.Tasks
+            .Where(task => task.UserId == _currentUserService.UserId)
+            .ToListAsync();
     }
 
     public async Task<TaskItem?> ShowTask(int id)
     {
-        return await db.Tasks.FirstOrDefaultAsync(task => task.Id == id);
+        return await db.Tasks.FirstOrDefaultAsync(task =>
+            task.Id == id &&
+            task.UserId == _currentUserService.UserId
+        );
     }
 }

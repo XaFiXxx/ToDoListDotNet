@@ -27,6 +27,9 @@ builder.Services.AddScoped<TaskMapper>();
 
 builder.Services.AddScoped<AuthService>();
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 string jwtKey = builder.Configuration["Jwt:Key"]!;
 string issuer = builder.Configuration["Jwt:Issuer"]!;
 string audience = builder.Configuration["Jwt:Audience"]!;
